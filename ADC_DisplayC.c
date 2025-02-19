@@ -28,6 +28,8 @@
 
 volatile bool botao_joystick_pressionado = false;
 volatile bool botao_a_pressionado = false;
+bool led_verde_estado = false;
+int border_status = 0;
 
 void gpio_callback(uint gpio, uint32_t events) {
     static uint32_t last_interrupt_time = 0;
@@ -101,7 +103,6 @@ int main() {
     uint16_t adc_x, adc_y;
     int square_y = (WIDTH - QUADRADO_TAMANHO) / 2;
     int square_x = (HEIGHT - QUADRADO_TAMANHO) / 2;
-    int border_status = 0;
     bool leds_ativos = true;
 
     while (true) {
@@ -132,12 +133,9 @@ int main() {
 
         if (botao_joystick_pressionado) {
             botao_joystick_pressionado = false;
+            led_verde_estado = !led_verde_estado;
+            set_pwm_duty(LED_G, led_verde_estado ? 4095 : 0);
             border_status = (border_status + 1) % 3;
-            if (border_status == 0) {
-                set_pwm_duty(LED_G, 0);
-            } else {
-                set_pwm_duty(LED_G, 4095);
-            }
         }
 
         if (botao_a_pressionado) {
